@@ -1,14 +1,22 @@
+
+using Photon.Pun;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Photon.Pun;
+using Photon.Realtime;
 
-public class player_controller : MonoBehaviour
+using Hashtable = ExitGames.Client.Photon.Hashtable;
+
+public class player_controller : MonoBehaviourPunCallbacks
 {
+    [SerializeField] Item[] items;
 
     [SerializeField] GameObject camController;
+
+    int itemIndex;
+    int previousItemIndex = -1;
+
     public int mouseSentivity = 100;
-    public Transform playerBody;
     float xRotation = 0f;
 
     public float moveSpeed = 12f;
@@ -33,7 +41,11 @@ public class player_controller : MonoBehaviour
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
-        if(!PV.IsMine)
+        if(PV.IsMine)
+        {
+            EquipItem(0);
+        }
+        else
         {
             Destroy(GetComponentInChildren<Camera>().gameObject);
         }
@@ -44,6 +56,7 @@ public class player_controller : MonoBehaviour
         return;
         PlayerMotor();
         CameraMotor();
+        WeaponSwitcher();
     }
 
     void PlayerMotor(){
@@ -80,4 +93,47 @@ public class player_controller : MonoBehaviour
         camController.transform.localRotation = Quaternion.Euler(xRotation, 0f, 0f);
         transform.Rotate(Vector3.up, mouseX);
     }    
+
+    void EquipItem(int _index)
+    {
+        if(_index == previousItemIndex)        
+            return;
+        
+        itemIndex = _index;
+        items[itemIndex].itemGameObject.SetActive(true);
+        if(previousItemIndex != -1)
+        {
+            items[previousItemIndex].itemGameObject.SetActive(false);
+        }
+        previousItemIndex = itemIndex;
+
+        if(PV.IsMine)
+        {
+            Hashtable hash = new Hashtable();
+            hash.Add("itemIndex", itemIndex);
+            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
+        }
+    }
+
+    void WeaponSwitcher()
+    {
+        for (int i = 0; i<items.Length; i++)
+        {
+            if(Input.GetKeyDown((i + 1).ToString()))
+            {
+                EquipItem(i);
+                break;
+            }
+        }
+    }
+
+    public override void OnPlayerPropertiesUpdate(Player targetPlayer, Hashtable changedProps)
+    {
+        if(!PV.IsMine && targetPlayer == PV.Owner)
+        {
+            EquipItem((int)changedProps["itemIndex"]);
+        }
+    }
+
+    
 }

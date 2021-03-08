@@ -7,6 +7,8 @@ using System.IO;
 public class PlayerManager : MonoBehaviour
 {
     PhotonView PV;
+    GameObject [] respawns;
+    GameObject controller;
     void Awake()
     {
         PV = GetComponent<PhotonView>();
@@ -22,8 +24,22 @@ public class PlayerManager : MonoBehaviour
 
     void CreateController()
     {
-        Vector3 spawn = new Vector3 (0, 10f, 0);
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , "PlayerController"), spawn, Quaternion.identity);
+        if(respawns == null)
+        {
+            respawns = GameObject.FindGameObjectsWithTag("Respawn");
+        }
+
+        int i = Random.Range(0, respawns.Length);
+        Debug.Log(i);
+        Vector3 spawn = respawns[i].transform.position;
+
+        controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , "PlayerController"), spawn, Quaternion.identity);
+    }
+
+    public void Die()
+    {
+        PhotonNetwork.Destroy(controller);
+        CreateController();
     }
     
     
