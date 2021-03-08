@@ -33,7 +33,7 @@ public class PlayerManager : MonoBehaviour
         Debug.Log(i);
         Vector3 spawn = respawns[i].transform.position;
 
-        controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , "PlayerController"), spawn, Quaternion.identity);
+        controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , "PlayerController"), spawn, Quaternion.identity, 0, new object [] {PV.ViewID});
     }
 
     public void Die()

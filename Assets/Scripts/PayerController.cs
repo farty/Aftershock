@@ -7,7 +7,7 @@ using Photon.Realtime;
 
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class player_controller : MonoBehaviourPunCallbacks
+public class PayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     [SerializeField] Item[] items;
 
@@ -32,10 +32,17 @@ public class player_controller : MonoBehaviourPunCallbacks
   
     CharacterController controller;
     PhotonView PV;
+
+    const float maxHealth = 100f;
+    float currentHealth = maxHealth;
+    
+    PlayerManager playerManager;
     void Awake()
     {
         controller = GetComponent<CharacterController>();
         PV = GetComponent<PhotonView>();
+
+        playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
     }
 
     void Start()
@@ -57,6 +64,10 @@ public class player_controller : MonoBehaviourPunCallbacks
         PlayerMotor();
         CameraMotor();
         WeaponSwitcher();
+        if(Input.GetMouseButtonDown(0))
+        {
+            items[itemIndex].Use();
+        }
     }
 
     void PlayerMotor(){
@@ -133,7 +144,29 @@ public class player_controller : MonoBehaviourPunCallbacks
         {
             EquipItem((int)changedProps["itemIndex"]);
         }
+    } 
+
+    public void TakeDamage(float damage)
+    {
+        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
     }
 
-    
+    [PunRPC]
+    void RPC_TakeDamage(float damage)
+    {
+        if(!PV.IsMine)
+        return;
+
+       currentHealth -= damage;
+
+       if(currentHealth <= 0)
+       {
+           Die();
+       }
+    }
+
+    void Die()
+    {
+        playerManager.Die();
+    }
 }
