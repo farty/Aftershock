@@ -16,6 +16,9 @@ ModelImporter:
     100020: Cube.010
     100022: Cube.011
     100024: //RootNode
+    100026: Cube__120_
+    100028: unlazable
+    100030: Cube__120_.001
     400000: Cube
     400002: Cube.001
     400004: Cube.002
@@ -29,6 +32,9 @@ ModelImporter:
     400020: Cube.010
     400022: Cube.011
     400024: //RootNode
+    400026: Cube__120_
+    400028: unlazable
+    400030: Cube__120_.001
     2100000: No Name
     2100002: Material
     2300000: Cube
@@ -43,6 +49,10 @@ ModelImporter:
     2300018: Cube.009
     2300020: Cube.010
     2300022: Cube.011
+    2300024: //RootNode
+    2300026: Cube__120_
+    2300028: unlazable
+    2300030: Cube__120_.001
     3300000: Cube
     3300002: Cube.001
     3300004: Cube.002
@@ -55,6 +65,10 @@ ModelImporter:
     3300018: Cube.009
     3300020: Cube.010
     3300022: Cube.011
+    3300024: //RootNode
+    3300026: Cube__120_
+    3300028: unlazable
+    3300030: Cube__120_.001
     4300000: Cube
     4300002: Cube.001
     4300004: Cube.002
@@ -67,6 +81,9 @@ ModelImporter:
     4300018: Cube.009
     4300020: Cube.010
     4300022: Cube.011
+    4300024: unlazable
+    4300026: Cube__120_
+    4300028: Cube__120_.001
     6400000: Cube
     6400002: Cube.001
     6400004: Cube.002
@@ -79,18 +96,52 @@ ModelImporter:
     6400018: Cube.009
     6400020: Cube.010
     6400022: Cube.011
+    6400024: //RootNode
+    6400026: Cube__120_
+    6400028: unlazable
+    6400030: Cube__120_.001
     2186277476908879412: ImportLogs
   externalObjects:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
+      name: Default_Material
+    second: {fileID: 2100000, guid: 0810b37a56087f7468f34fce07f43a3c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
       name: Material
-    second: {fileID: 2100000, guid: 6fdc156a682cb4249861a9817223ee17, type: 2}
+    second: {fileID: 2100000, guid: 05a1c5282e2104c4886cb1239a64ad4d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Material.001
+    second: {fileID: 2100000, guid: d62e5719f054bee47bbab77b43571e19, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
       name: No Name
     second: {fileID: 2100000, guid: db43ce6c56e9aa548b0efd7a20e4dcd7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: building
+    second: {fileID: 2100000, guid: 05a1c5282e2104c4886cb1239a64ad4d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: green
+    second: {fileID: 2100000, guid: db43ce6c56e9aa548b0efd7a20e4dcd7, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: purple
+    second: {fileID: 2100000, guid: f0ebb1af6796415488a491a96fb3e2ed, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: red
+    second: {fileID: 2100000, guid: 6fdc156a682cb4249861a9817223ee17, type: 2}
   materials:
     importMaterials: 1
     materialName: 0
