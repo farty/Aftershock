@@ -30,7 +30,6 @@ public class PlayerManager : MonoBehaviour
         }
 
         int i = Random.Range(0, respawns.Length);
-        Debug.Log(i);
         Vector3 spawn = respawns[i].transform.position;
 
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , "PlayerController"), spawn, Quaternion.identity, 0, new object [] {PV.ViewID});
@@ -41,6 +40,4 @@ public class PlayerManager : MonoBehaviour
         PhotonNetwork.Destroy(controller);
         CreateController();
     }
-    
-    
 }
