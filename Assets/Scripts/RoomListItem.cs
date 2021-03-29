@@ -20,7 +20,6 @@ public class RoomListItem : MonoBehaviour
 
    public void OnClick()
    {
-      Debug.Log("click");
       Launcher.Instance.JoinRoom(info);
    }
 }

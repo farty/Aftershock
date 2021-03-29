@@ -14,7 +14,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     [SerializeField] TMP_Text errorText;
     [SerializeField] TMP_Text roomNameText;
     [SerializeField] Transform roomListContent;    
-    [SerializeField] Transform playerListContent;
+    [SerializeField] Transform playerListContent;    
     [SerializeField] GameObject roomListItemPrefab;
     [SerializeField] GameObject playerListItemPrefab;
     [SerializeField] GameObject startGameButton;
@@ -29,15 +29,12 @@ public class Launcher : MonoBehaviourPunCallbacks
         Debug.Log("Connecting to MASTER");
         PhotonNetwork.ConnectUsingSettings();        
     }
-
     public override void OnConnectedToMaster()
     {
         Debug.Log("Connected to MASTER");
         PhotonNetwork.JoinLobby();
         PhotonNetwork.AutomaticallySyncScene = true;
-
     }
-
     public override void OnJoinedLobby()
     {
         MenuManager.Instance.OpenMenu("title");
@@ -89,6 +86,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     public void StartGame()
     {
         PhotonNetwork.LoadLevel(1);
+        MenuManager.Instance.OpenMenu("in game ui");
     }
 
     public void LeaveRoom()
@@ -107,7 +105,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         MenuManager.Instance.OpenMenu("title");
     }
-
+  
     public override void OnRoomListUpdate (List<RoomInfo> roomList)
     {
         foreach (Transform trans in roomListContent)
@@ -121,10 +119,12 @@ public class Launcher : MonoBehaviourPunCallbacks
             Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(roomList[i]);
         }
     }
-
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
     public override void OnPlayerEnteredRoom(Player newPlayer) 
     {
          Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
     }
-
 }

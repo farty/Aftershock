@@ -8,25 +8,36 @@ using UnityEngine.AI;
 public class enemy_1_behavior : MonoBehaviour, IDamageable
 {
     public float retreatDistance = 2f;
+    
     const float maxHealth = 10f;
+    [SerializeField]
     float currentHealth = maxHealth;
 
     public NavMeshAgent agent;
+    [SerializeField]
     GameObject targetPlayer;
     PhotonView PV;
     [SerializeField]
     float distanceToTarget = 0f;
+
+    float timeBetweenAttacks;
+    public float startTimeBetweenAttacks = 2;
     void Start()
     {
+        timeBetweenAttacks = startTimeBetweenAttacks;
         PV = GetComponent<PhotonView>();
         agent = GetComponent<NavMeshAgent>();
     }
 
     void Update()
     {
+        ChasePlayer();
+        Attack();
+    }
+    void ChasePlayer()
+    {
         if(PV.IsMine)
         {
-
             float distanceToClosestEnemy = Mathf.Infinity;
             GameObject closestEnemy = null;
             GameObject [] allEnemies = GameObject.FindGameObjectsWithTag("Player");
@@ -53,14 +64,12 @@ public class enemy_1_behavior : MonoBehaviour, IDamageable
                 {
                     agent.SetDestination(transform.position);
                 }                
-            }            
-        }        
+            } 
+        }
     }
-
     public void TakeDamage(float damage)
     {
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
-        Debug.Log(damage);
     }
 
     [PunRPC]
@@ -82,5 +91,25 @@ public class enemy_1_behavior : MonoBehaviour, IDamageable
         {
             PhotonNetwork.Destroy(gameObject);
         }        
+    }
+
+    void Attack()
+    {
+        
+        if(timeBetweenAttacks >= startTimeBetweenAttacks) 
+        {
+            if(distanceToTarget<=retreatDistance)
+            {
+                if(targetPlayer != null)
+                {
+                    timeBetweenAttacks = 0;
+                    targetPlayer.GetComponent<IDamageable>()?.TakeDamage(10);
+                }                                
+            }            
+        }
+        else
+        {
+            timeBetweenAttacks+= Time.deltaTime;
+        }
     }
 }

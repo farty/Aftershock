@@ -26,7 +26,6 @@ public class LevelController : MonoBehaviourPunCallbacks
     public float timeBetweenWaves = 5f;
     public float waveCountown;
 
-
     private SpawnState state = SpawnState.COUNTING;
     void Start()
     {
@@ -94,7 +93,6 @@ public class LevelController : MonoBehaviourPunCallbacks
         if(PhotonNetwork.IsMasterClient)
         {
             state = SpawnState.SPAWNING;
-            Debug.Log("Spawning wave"+ _wave.name);
             for(int i = 0; i<_wave.count; i++)
             {
                 SpanwEnemy(_wave.enemy);
@@ -111,8 +109,6 @@ public class LevelController : MonoBehaviourPunCallbacks
     {
         int i = Random.Range(0, spawnPoints.Length);
         Vector3 spawn = spawnPoints[i].transform.position;
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs",_enemy.name),spawn, Quaternion.identity);
-        Debug.Log("Spawning enemy" + _enemy.name);
-        
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs",_enemy.name),spawn, Quaternion.identity);        
     }
 }

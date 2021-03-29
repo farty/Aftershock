@@ -1,4 +1,4 @@
-﻿using System.Collections;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
@@ -9,7 +9,7 @@ public class RoomManager : MonoBehaviourPunCallbacks
 {
 
     public static RoomManager Instance;
-
+    
     void Awake()
     {
         if(Instance)
@@ -20,6 +20,8 @@ public class RoomManager : MonoBehaviourPunCallbacks
         DontDestroyOnLoad(gameObject);
         Instance = this;
     }
+
+    
 
     public override void OnEnable() 
     {
@@ -38,6 +40,6 @@ public class RoomManager : MonoBehaviourPunCallbacks
         {
             PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs","PlayerManager"), Vector3.zero, Quaternion.identity);
         }
-    }
-    
+        
+    }    
 }

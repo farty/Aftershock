@@ -10,7 +10,8 @@ using Hashtable = ExitGames.Client.Photon.Hashtable;
 public class PayerController : MonoBehaviourPunCallbacks, IDamageable
 {
     [SerializeField] Item[] items;
-
+    [SerializeField] GameObject InGameUi;
+    GameObject _inGameUi;
     [SerializeField] GameObject camController;
 
     int itemIndex;
@@ -37,6 +38,8 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
     float currentHealth = maxHealth;
     
     PlayerManager playerManager;
+
+    public InGameUi inGameUiController;
     void Awake()
     {
         controller = GetComponent<CharacterController>();
@@ -48,9 +51,13 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
     void Start()
     {
         Cursor.lockState = CursorLockMode.Locked;
+        
         if(PV.IsMine)
         {
             EquipItem(0);
+            GameObject _inGameUi = Instantiate(InGameUi, Vector3.zero, Quaternion.identity);
+            InGameUi = _inGameUi;
+            inGameUiController = InGameUi.GetComponent<InGameUi>();
         }
         else
         {
@@ -64,6 +71,7 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
         PlayerMotor();
         CameraMotor();
         WeaponSwitcher();
+        HealthBarController();
         if(Input.GetMouseButtonDown(0))
         {
             items[itemIndex].Use();
@@ -148,6 +156,7 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
 
     public void TakeDamage(float damage)
     {
+        inGameUiController.TakeDamage();
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
     }
 
@@ -168,5 +177,12 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
     void Die()
     {
         playerManager.Die();
+    }
+
+    void HealthBarController()
+    {
+        
+        inGameUiController.SetMaxHealth(maxHealth);
+        inGameUiController.SetHealth(currentHealth);
     }
 }
