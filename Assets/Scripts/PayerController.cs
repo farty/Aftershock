@@ -156,7 +156,6 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
 
     public void TakeDamage(float damage)
     {
-        inGameUiController.TakeDamage();
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
     }
 
@@ -167,7 +166,7 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
         return;
 
        currentHealth -= damage;
-
+       inGameUiController.TakeDamage();
        if(currentHealth <= 0)
        {
            Die();
