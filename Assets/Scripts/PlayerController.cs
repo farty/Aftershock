@@ -7,9 +7,9 @@ using Photon.Realtime;
 
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
-public class PayerController : MonoBehaviourPunCallbacks, IDamageable
+public class PlayerController : MonoBehaviourPunCallbacks
 {
-    [SerializeField] Item[] items;
+    [SerializeField] GameObject[] guns;
     [SerializeField] GameObject InGameUi;
     GameObject _inGameUi;
     [SerializeField] GameObject camController;
@@ -72,10 +72,7 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
         CameraMotor();
         WeaponSwitcher();
         HealthBarController();
-        if(Input.GetMouseButtonDown(0))
-        {
-            items[itemIndex].Use();
-        }
+        
     }
 
     void PlayerMotor(){
@@ -119,28 +116,15 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
             return;
         
         itemIndex = _index;
-        items[itemIndex].itemGameObject.SetActive(true);
+        guns[itemIndex].GetComponent<WeaponSwitcher>()?.SwitchWeapon();
         if(previousItemIndex != -1)
         {
-            items[previousItemIndex].itemGameObject.SetActive(false);
+            guns[previousItemIndex].GetComponent<WeaponSwitcher>()?.SwitchWeapon();
         }
         previousItemIndex = itemIndex;
 
         if(PV.IsMine)
-        {
-            Hashtable hash = new Hashtable();
-            hash.Add("itemIndex", itemIndex);
-            PhotonNetwork.LocalPlayer.SetCustomProperties(hash);
-        }
-    }
-
-    void WeaponSwitcher()
-    {
-        for (int i = 0; i<items.Length; i++)
-        {
-            if(Input.GetKeyDown((i + 1).ToString()))
             {
-                EquipItem(i);
                 break;
             }
         }
@@ -153,7 +137,24 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
             EquipItem((int)changedProps["itemIndex"]);
         }
     } 
-
+    void HealthBarController()
+    {   
+        inGameUiController.SetMaxHealth(maxHealth);
+        inGameUiController.SetHealth(currentHealth);
+        Debug.Log(maxHealth);
+        Debug.Log(currentHealth);
+    }
+    void OnTriggerEnter(Collider other)
+    {
+        if(PV.IsMine)
+        {   
+            if(other.gameObject.CompareTag("bullet"))
+            {
+                float damage = other.gameObject.GetComponent<Bullet>().damage;
+                TakeDamage(damage);
+            }
+        }
+    }
     public void TakeDamage(float damage)
     {
         PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
@@ -176,12 +177,5 @@ public class PayerController : MonoBehaviourPunCallbacks, IDamageable
     void Die()
     {
         playerManager.Die();
-    }
-
-    void HealthBarController()
-    {
-        
-        inGameUiController.SetMaxHealth(maxHealth);
-        inGameUiController.SetHealth(currentHealth);
     }
 }

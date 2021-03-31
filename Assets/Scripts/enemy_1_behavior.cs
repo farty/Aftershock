@@ -5,7 +5,7 @@ using Photon.Pun;
 using UnityEngine.AI;
 
 
-public class enemy_1_behavior : MonoBehaviour, IDamageable
+public class enemy_1_behavior : MonoBehaviour
 {
     public float retreatDistance = 2f;
     
@@ -103,13 +103,25 @@ public class enemy_1_behavior : MonoBehaviour, IDamageable
                 if(targetPlayer != null)
                 {
                     timeBetweenAttacks = 0;
-                    targetPlayer.GetComponent<IDamageable>()?.TakeDamage(10);
+                    targetPlayer.GetComponent<PlayerController>()?.TakeDamage(10);
                 }                                
             }            
         }
         else
         {
             timeBetweenAttacks+= Time.deltaTime;
+        }
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(PV.IsMine)
+        {   
+            if(other.gameObject.CompareTag("bullet"))
+            {
+                float damage = other.gameObject.GetComponent<Bullet>().damage;
+                TakeDamage(damage);
+            }
         }
     }
 }

@@ -76,7 +76,6 @@ public class InGameUi : MonoBehaviour
     {
         if(a>0)
         {
-            Debug.Log(a);
             a-=0.1f;
         } 
         Color c = new Color(r,g,b,a);  

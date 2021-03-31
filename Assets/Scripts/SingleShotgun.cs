@@ -1,22 +1,27 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Photon.Pun;
+using System.IO;
 
-public class SingleShotgun : Gun
+public class SingleShotgun : MonoBehaviourPunCallbacks
 {
-    [SerializeField] Camera cam;
-     public override void Use()
+    [SerializeField] 
+    GameObject itemGameObject;
+    [SerializeField] 
+    GameObject bulletSpawnPoint;
+    [SerializeField] 
+    GameObject bullet;
+    
+    void Update()
     {
-        Shoot();
+        if(Input.GetMouseButtonDown(0))
+        {
+            Shoot();
+        }
     }
-
-     void Shoot()
-     {
-         Ray ray = cam.ViewportPointToRay(new Vector3 (0.5f, 0.5f));
-         ray.origin = cam.transform.position;
-         if(Physics.Raycast(ray, out RaycastHit hit))
-         {
-            hit.collider.gameObject.GetComponent<IDamageable>()?.TakeDamage(((GunInfo)itemInfo).damage);
-         }
-     } 
+    public void Shoot()
+    {
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , bullet.name), bulletSpawnPoint.transform.position, bulletSpawnPoint.transform.rotation);            
+    } 
 }
