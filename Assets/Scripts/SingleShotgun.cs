@@ -12,7 +12,9 @@ public class SingleShotgun : MonoBehaviourPunCallbacks
     GameObject bulletSpawnPoint;
     [SerializeField] 
     GameObject bullet;
-    
+    [SerializeField] 
+    GameObject owner;
+
     void Update()
     {
         if(Input.GetMouseButtonDown(0))
@@ -22,6 +24,9 @@ public class SingleShotgun : MonoBehaviourPunCallbacks
     }
     public void Shoot()
     {
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , bullet.name), bulletSpawnPoint.transform.position, bulletSpawnPoint.transform.rotation);            
+        if(owner.GetComponent<PlayerController>().PV.IsMine)
+        {
+            PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , bullet.name), bulletSpawnPoint.transform.position, bulletSpawnPoint.transform.rotation);
+        }                    
     } 
 }

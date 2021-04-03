@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Photon.Pun;
 using UnityEngine.AI;
-
+using System.IO;
 
 public class enemy_1_behavior : MonoBehaviour
 {
@@ -19,7 +19,8 @@ public class enemy_1_behavior : MonoBehaviour
     PhotonView PV;
     [SerializeField]
     float distanceToTarget = 0f;
-
+    [SerializeField]
+    GameObject rewardPrefab;
     float timeBetweenAttacks;
     public float startTimeBetweenAttacks = 2;
     void Start()
@@ -89,7 +90,8 @@ public class enemy_1_behavior : MonoBehaviour
     {
         if(PV.IsMine)
         {
-            PhotonNetwork.Destroy(gameObject);
+            GiveReward();
+            PhotonNetwork.Destroy(gameObject);            
         }        
     }
 
@@ -113,15 +115,8 @@ public class enemy_1_behavior : MonoBehaviour
         }
     }
 
-    void OnTriggerEnter(Collider other)
+    public void GiveReward()
     {
-        if(PV.IsMine)
-        {   
-            if(other.gameObject.CompareTag("bullet"))
-            {
-                float damage = other.gameObject.GetComponent<Bullet>().damage;
-                TakeDamage(damage);
-            }
-        }
+        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , rewardPrefab.name), transform.position, transform.rotation);
     }
 }

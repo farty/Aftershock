@@ -34,10 +34,4 @@ public class PlayerManager : MonoBehaviour
 
         controller = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , "PlayerController"), spawn, Quaternion.identity, 0, new object [] {PV.ViewID});
     }
-
-    public void Die()
-    {
-        PhotonNetwork.Destroy(controller);
-        CreateController();
-    }
 }

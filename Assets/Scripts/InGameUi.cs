@@ -9,6 +9,7 @@ using UnityEngine.UI;
 public class InGameUi : MonoBehaviour
 {
     [SerializeField] GameObject inGameMenu;
+    [SerializeField] GameObject defeatMenu;
     [SerializeField] Image overlayImage;
     public Slider slider;
 
@@ -26,6 +27,9 @@ public class InGameUi : MonoBehaviour
     }
     void Update()
     {
+        if(defeatMenu.activeSelf)
+        return;
+        
         DamageIndicator();
        if (Input.GetKeyDown(KeyCode.Escape))
             {            
@@ -47,7 +51,7 @@ public class InGameUi : MonoBehaviour
     {
         Debug.Log("continue");
         Cursor.lockState = CursorLockMode.Locked;
-        MenuManager.Instance.OpenMenu("in game ui");        
+        MenuManager.Instance.OpenMenu("in game ui"); 
     }
     public void ExitLevel()
     {
