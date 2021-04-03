@@ -198,8 +198,12 @@ public class PlayerController : MonoBehaviourPunCallbacks
     {
         if(PV.IsMine)
         {
-            Debug.Log(reward);
-            score.currentScore += reward;
+            if(!isdead)
+            {
+                Debug.Log(reward);
+                score.currentScore += reward;
+            }
+            
         }
     }
 }

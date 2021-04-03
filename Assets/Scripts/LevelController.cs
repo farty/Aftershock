@@ -69,7 +69,6 @@ public class LevelController : MonoBehaviourPunCallbacks
             
             if(nextWave+1 > waves.Length-1)
             {
-                nextWave = 0;
                 Debug.Log("All waves completed");
             }
             else

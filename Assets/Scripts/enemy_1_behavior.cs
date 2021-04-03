@@ -9,7 +9,7 @@ public class enemy_1_behavior : MonoBehaviour
 {
     public float retreatDistance = 2f;
     
-    const float maxHealth = 10f;
+    const float maxHealth = 20;
     [SerializeField]
     float currentHealth = maxHealth;
 
@@ -21,6 +21,9 @@ public class enemy_1_behavior : MonoBehaviour
     float distanceToTarget = 0f;
     [SerializeField]
     GameObject rewardPrefab;
+
+    [SerializeField]
+    int damage = 20;
     float timeBetweenAttacks;
     public float startTimeBetweenAttacks = 2;
     void Start()
@@ -105,7 +108,7 @@ public class enemy_1_behavior : MonoBehaviour
                 if(targetPlayer != null)
                 {
                     timeBetweenAttacks = 0;
-                    targetPlayer.GetComponent<PlayerController>()?.TakeDamage(10);
+                    targetPlayer.GetComponent<PlayerController>()?.TakeDamage(damage);
                 }                                
             }            
         }
