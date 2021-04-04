@@ -1,17 +1,14 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using UnityEngine;
 
 public static class ConfigReader
 {
-    public static Dictionary<string,string> GetConfigFromJson(string path = "/Resources/config.json")
+    public static SimpleConfig GetConfigFromJson(string path = "/Resources/config.json")
     {
-        Dictionary<string, string> configDictionary = new Dictionary<string, string>();
         string fullPath = Application.dataPath + path;
         string jsonString = File.ReadAllText(fullPath);
         var output = JsonUtility.FromJson<SimpleConfig>(jsonString);
-        Debug.Log(output.wave_count);
-        return configDictionary;
+        return output;
     }
 }
 
