@@ -5,29 +5,45 @@ using Photon.Pun;
 using TMPro;
 using Photon.Realtime;
 using System.Linq;
+using System.Runtime.Serialization.Formatters.Binary;
+using System.IO;
 
 public class Launcher : MonoBehaviourPunCallbacks
 {
     public static Launcher Instance;
-
-    [SerializeField] TMP_InputField roomNameInputField;
-    [SerializeField] TMP_Text errorText;
-    [SerializeField] TMP_Text roomNameText;
-    [SerializeField] Transform roomListContent;    
+  
     [SerializeField] Transform playerListContent;    
     [SerializeField] GameObject roomListItemPrefab;
     [SerializeField] GameObject playerListItemPrefab;
-    [SerializeField] GameObject startGameButton;
-
+    [SerializeField] int maxPlayers = 2;
+    [SerializeField] TMP_InputField _playerNickName;
+    [SerializeField] TMP_Text playerNickName;
+    string nickname;
+    
     void Awake()
     {
         Instance = this;
+
+        string path = Application.persistentDataPath + "/player.nickname";
+        if(File.Exists(path))
+        {
+            BinaryFormatter formatter = new BinaryFormatter();
+            FileStream stream = new FileStream(path, FileMode.Open);
+
+            nickname = formatter.Deserialize(stream) as string;
+        }
+        else
+        {
+            nickname = "Player " + Random.Range(0, 1000).ToString("0000");
+        }
+        
     }
 
     void Start()
     {
         Debug.Log("Connecting to MASTER");
-        PhotonNetwork.ConnectUsingSettings();        
+        PhotonNetwork.ConnectUsingSettings();  
+        playerNickName.text = nickname;
     }
     public override void OnConnectedToMaster()
     {
@@ -39,55 +55,9 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         MenuManager.Instance.OpenMenu("title");
         Debug.Log("JoinedLobby");
-        PhotonNetwork.NickName = "Player " + Random.Range(0, 1000).ToString("0000");
+        PhotonNetwork.NickName = nickname;
     }
-
-    public void CreateRoom()
-    {
-        if(string.IsNullOrEmpty(roomNameInputField.text))
-        {
-            return;
-        }
-        PhotonNetwork.CreateRoom(roomNameInputField.text);
-        MenuManager.Instance.OpenMenu("loading");
-    }
-
-    public override void OnJoinedRoom()
-    {
-       MenuManager.Instance.OpenMenu ("room");
-       roomNameText.text = PhotonNetwork.CurrentRoom.Name;
-       
-       Player[] players = PhotonNetwork.PlayerList;
-
-       foreach(Transform child in playerListContent)
-       {
-           Destroy(child.gameObject);
-       }
-        for (int i = 0; i < players.Count(); i++)
-        {
-            Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
-        }
-
-        startGameButton.SetActive(PhotonNetwork.IsMasterClient);
-    }
-
-    public override void OnMasterClientSwitched(Player newMasterClient)
-    {
-        startGameButton.SetActive(PhotonNetwork.IsMasterClient);
-    }
-
-    public override void OnCreateRoomFailed(short returnCode, string message)
-    {
-        errorText.text = "Room creation failed: "+ message;
-        MenuManager.Instance.OpenMenu("error");
-        
-    }
-
-    public void StartGame()
-    {
-        PhotonNetwork.LoadLevel(1);
-        MenuManager.Instance.OpenMenu("in game ui");
-    }
+    
 
     public void LeaveRoom()
     {
@@ -106,7 +76,7 @@ public class Launcher : MonoBehaviourPunCallbacks
         MenuManager.Instance.OpenMenu("title");
     }
   
-    public override void OnRoomListUpdate (List<RoomInfo> roomList)
+    /*public override void OnRoomListUpdate (List<RoomInfo> roomList)
     {
         foreach (Transform trans in roomListContent)
         {
@@ -119,12 +89,78 @@ public class Launcher : MonoBehaviourPunCallbacks
             Instantiate(roomListItemPrefab, roomListContent).GetComponent<RoomListItem>().SetUp(roomList[i]);
         }
     }
-    public void QuitGame()
+    */
+    
+    
+    
+
+    public void FindhGame()
+    {        
+        PhotonNetwork.JoinRandomRoom();
+    }
+
+    public override void OnJoinRandomFailed(short returnCode, string message)
     {
-        Application.Quit();
+        Debug.Log("PUN Basics Tutorial/Launcher:OnJoinRandomFailed() was called by PUN. No random room available, so we create one.\nCalling: PhotonNetwork.CreateRoom");
+
+        // #Critical: we failed to join a random room, maybe none exists or they are all full. No worries, we create a new room.
+        CreateRoom();
+    }
+    void CreateRoom()
+    {
+        PhotonNetwork.CreateRoom("village");
+        MenuManager.Instance.OpenMenu("loading");
+    }
+    public override void OnJoinedRoom()
+    {
+        MenuManager.Instance.OpenMenu ("room");
+       
+        Player[] players = PhotonNetwork.PlayerList;
+
+        foreach(Transform child in playerListContent)
+        {
+           Destroy(child.gameObject);
+        }
+        for (int i = 0; i < players.Count(); i++)
+        {
+            Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(players[i]);
+        }        
     }
     public override void OnPlayerEnteredRoom(Player newPlayer) 
     {
          Instantiate(playerListItemPrefab, playerListContent).GetComponent<PlayerListItem>().SetUp(newPlayer);
+         if(PhotonNetwork.CurrentRoom.PlayerCount == maxPlayers)
+        {
+            if(PhotonNetwork.IsMasterClient)
+            {
+                StartGame();
+            }            
+        }
+    }    
+    public void StartGame()
+    {
+        PhotonNetwork.LoadLevel(1);
+        MenuManager.Instance.OpenMenu("in game ui");
     }
+    
+    public void QuitGame()
+    {
+        Application.Quit();
+    }
+
+    public void SetPlayerNickName()
+    {
+        nickname = _playerNickName.text;
+        playerNickName.text = nickname;
+        PhotonNetwork.NickName = nickname;
+
+        BinaryFormatter formatter = new BinaryFormatter();
+
+        string path = Application.persistentDataPath + "/player.nickname";
+        FileStream stream = new FileStream(path, FileMode.Create);
+
+        formatter.Serialize(stream, nickname);
+        stream.Close();
+    }
+    
 }
