@@ -10,9 +10,12 @@ public class InGameUi : MonoBehaviour
 {
     [SerializeField] GameObject inGameMenu;
     [SerializeField] GameObject defeatMenu;
+    [SerializeField] PlayerController playcerController;
     [SerializeField] Image overlayImage;
+    public HealthManager healthManager;
     public Slider slider;
-
+    float sliderMaxHealth;
+    float sliderCurHealth;
     float r;
     float g;
     float b;
@@ -24,6 +27,10 @@ public class InGameUi : MonoBehaviour
         g = overlayImage.color.g;
         b = overlayImage.color.b;
         a = 0;
+        
+        playcerController = GetComponent<PlayerController>();
+        sliderCurHealth = healthManager.currentHealth;
+        sliderMaxHealth = healthManager.maxHealth;
     }
     void Update()
     {
@@ -31,7 +38,63 @@ public class InGameUi : MonoBehaviour
         return;
         
         DamageIndicator();
-       if (Input.GetKeyDown(KeyCode.Escape))
+        EscapeButtonChecker();
+        ManageHealth();
+
+    }
+     public void Continue()
+    {
+        Cursor.lockState = CursorLockMode.Locked;
+        MenuManager.Instance.OpenMenu("in game ui"); 
+    }
+    public void ExitLevel()
+    {
+        GameObject roomManager = GameObject.FindWithTag("room_manager");
+        Destroy(roomManager);
+        StartCoroutine(DisconnectAndLoad());
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
+    }
+
+    IEnumerator DisconnectAndLoad()
+    {
+        PhotonNetwork.Disconnect();
+        while(PhotonNetwork.IsConnected)
+        
+        yield return null;
+        SceneManager.LoadScene(0); 
+    }
+    
+    void DamageIndicator()
+    {
+        if(a>0)
+        {
+            a-=0.1f;
+        } 
+        Color c = new Color(r,g,b,a);  
+        overlayImage.color = c;      
+    }
+
+    public void TakeDamage()
+    {
+        a = 1;
+    }
+
+    void ManageHealth()
+    {
+        if(healthManager.currentHealth<sliderCurHealth)
+        {
+            TakeDamage();
+            sliderCurHealth = healthManager.currentHealth;
+            slider.value = sliderCurHealth;
+        }
+        sliderCurHealth = healthManager.currentHealth;
+        slider.maxValue = sliderMaxHealth;
+    }
+
+    void EscapeButtonChecker()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
             {            
             if(inGameMenu.activeSelf == false)
             {
@@ -46,48 +109,5 @@ public class InGameUi : MonoBehaviour
                 MenuManager.Instance.OpenMenu("in game ui");                
             }
         }
-    }
-     public void Continue()
-    {
-        Debug.Log("continue");
-        Cursor.lockState = CursorLockMode.Locked;
-        MenuManager.Instance.OpenMenu("in game ui"); 
-    }
-    public void ExitLevel()
-    {
-        GameObject roomManager = GameObject.FindWithTag("room_manager");
-        Destroy(roomManager);
-        StartCoroutine(DisconnectAndLoad());
-    }
-
-    IEnumerator DisconnectAndLoad()
-    {
-        PhotonNetwork.Disconnect();
-        while(PhotonNetwork.IsConnected)
-        yield return null;
-        SceneManager.LoadScene(0); 
-    }
-    public void SetMaxHealth(float health)
-    {
-        slider.maxValue = health;
-    }
-    public void SetHealth (float health)
-    {
-        slider.value = health;
-    }
-
-    void DamageIndicator()
-    {
-        if(a>0)
-        {
-            a-=0.1f;
-        } 
-        Color c = new Color(r,g,b,a);  
-        overlayImage.color = c;      
-    }
-
-    public void TakeDamage()
-    {
-        a = 1;
     }
 }

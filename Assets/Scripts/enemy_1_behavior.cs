@@ -26,17 +26,20 @@ public class enemy_1_behavior : MonoBehaviour
     int damage = 20;
     float timeBetweenAttacks;
     public float startTimeBetweenAttacks = 2;
+    HealthManager healthManager;
     void Start()
     {
         timeBetweenAttacks = startTimeBetweenAttacks;
         PV = GetComponent<PhotonView>();
         agent = GetComponent<NavMeshAgent>();
+        healthManager = GetComponent<HealthManager>();
     }
 
     void Update()
     {
         ChasePlayer();
         Attack();
+        Die();
     }
     void ChasePlayer()
     {
@@ -48,14 +51,17 @@ public class enemy_1_behavior : MonoBehaviour
 
             foreach (GameObject currentEnemy in allEnemies)
             {
-                float distanceToEnemy = (currentEnemy.transform.position - this.transform.position).sqrMagnitude;
-                if(distanceToEnemy<distanceToClosestEnemy)
+                if(currentEnemy.GetComponent<HealthManager>().isDead == false)
                 {
-                    distanceToClosestEnemy = distanceToEnemy;
-                    closestEnemy = currentEnemy;
-                    targetPlayer = currentEnemy;
-                    distanceToTarget = Vector3.Distance(transform.position, targetPlayer.transform.position);
-                }
+                    float distanceToEnemy = (currentEnemy.transform.position - this.transform.position).sqrMagnitude;
+                    if(distanceToEnemy<distanceToClosestEnemy)
+                    {
+                        distanceToClosestEnemy = distanceToEnemy;
+                        closestEnemy = currentEnemy;
+                        targetPlayer = currentEnemy;
+                        distanceToTarget = Vector3.Distance(transform.position, targetPlayer.transform.position);
+                    }
+                }                
             }
             if(Vector3.Distance(transform.position, targetPlayer.transform.position)> retreatDistance) 
             {
@@ -91,11 +97,15 @@ public class enemy_1_behavior : MonoBehaviour
 
     void Die()
     {
-        if(PV.IsMine)
+        if(healthManager.isDead)
         {
-            GiveReward();
-            PhotonNetwork.Destroy(gameObject);            
-        }        
+            if(PV.IsMine)
+            {
+                GiveReward(); 
+                PhotonNetwork.Destroy(gameObject);
+            }   
+        }
+             
     }
 
     void Attack()
@@ -108,7 +118,10 @@ public class enemy_1_behavior : MonoBehaviour
                 if(targetPlayer != null)
                 {
                     timeBetweenAttacks = 0;
-                    targetPlayer.GetComponent<PlayerController>()?.TakeDamage(damage);
+                    if(targetPlayer.GetComponent<HealthManager>().isDead == false)
+                    {
+                        targetPlayer.GetComponent<HealthManager>()?.TakeDamage(damage);
+                    }
                 }                                
             }            
         }
@@ -120,6 +133,6 @@ public class enemy_1_behavior : MonoBehaviour
 
     public void GiveReward()
     {
-        PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , rewardPrefab.name), transform.position, transform.rotation);
+        PhotonNetwork.InstantiateSceneObject(Path.Combine("PhotonPrefabs" , rewardPrefab.name), transform.position, transform.rotation);
     }
 }

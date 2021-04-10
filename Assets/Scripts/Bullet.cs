@@ -19,8 +19,7 @@ public class Bullet : MonoBehaviour
         RaycastHit[] hits = Physics.RaycastAll(new Ray(mPrevPos, (transform.position - mPrevPos).normalized), (transform.position - mPrevPos).magnitude);
         for(int i = 0; i< hits.Length; i++ )
         {
-            hits[i].collider.gameObject.GetComponent<PlayerController>()?.TakeDamage(damage);
-            hits[i].collider.gameObject.GetComponent<enemy_1_behavior>()?.TakeDamage(damage);
+            hits[i].collider.gameObject.GetComponent<HealthManager>()?.TakeDamage(damage);
             if(i>0)
             {
                 Destroy(gameObject);

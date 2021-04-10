@@ -9,12 +9,10 @@ using System.IO;
 using Hashtable = ExitGames.Client.Photon.Hashtable;
 
 public class PlayerController : MonoBehaviourPunCallbacks
-{
-    bool isdead = false;
-
+{    
     [SerializeField] GameObject[] guns;
     [SerializeField] GameObject InGameUi;
-    GameObject _inGameUi;
+    
     [SerializeField] GameObject camController;
     
     int itemIndex;
@@ -36,19 +34,19 @@ public class PlayerController : MonoBehaviourPunCallbacks
   
     CharacterController controller;
     public PhotonView PV;
-
-    const float maxHealth = 100f;
-    float currentHealth = maxHealth;
+    public HealthManager healthManager;
+    
     
     PlayerManager playerManager;
 
     public InGameUi inGameUiController;
     ScoreCounter score;
-    [SerializeField] GameObject rewardPrefab;
+
     void Awake()
     {
         controller = GetComponent<CharacterController>();
         PV = GetComponent<PhotonView>();
+        healthManager = GetComponent<HealthManager>();
         playerManager = PhotonView.Find((int)PV.InstantiationData[0]).GetComponent<PlayerManager>();
     }
 
@@ -59,9 +57,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if(PV.IsMine)
         {
             EquipItem(0);
-            GameObject _inGameUi = Instantiate(InGameUi, Vector3.zero, Quaternion.identity);
-            InGameUi = _inGameUi;
+            InGameUi = Instantiate(InGameUi, Vector3.zero, Quaternion.identity);            
             inGameUiController = InGameUi.GetComponent<InGameUi>();
+            inGameUiController.healthManager = GetComponent<HealthManager>();
             score = inGameUiController.GetComponentInChildren<ScoreCounter>();
         }
         else
@@ -76,8 +74,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
         
         PlayerMotor();
         CameraMotor();
-        HealthBarController();
-        
+        DeadCheck();
         for(int i = 0; i< guns.Length; i++)
         {
             if(Input.GetKeyDown((i+1).ToString()))
@@ -87,10 +84,9 @@ public class PlayerController : MonoBehaviourPunCallbacks
             }
         }
     }
-
     void PlayerMotor()
     {
-        if(isdead == false)
+        if(healthManager.isDead == false)
         {
             isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
         
@@ -118,7 +114,7 @@ public class PlayerController : MonoBehaviourPunCallbacks
     } 
     void CameraMotor()
     {
-        if(isdead == false)
+        if(healthManager.isDead == false)
         {
         float mouseX = Input.GetAxis("Mouse X") * mouseSentivity * Time.deltaTime;
         float mouseY = Input.GetAxis("Mouse Y") * mouseSentivity * Time.deltaTime;
@@ -159,51 +155,24 @@ public class PlayerController : MonoBehaviourPunCallbacks
             EquipItem((int)changedProps["itemIndex"]);
         }
     } 
-    void HealthBarController()
-    {   
-        inGameUiController.SetMaxHealth(maxHealth);
-        inGameUiController.SetHealth(currentHealth);
-    }
-    
-    public void TakeDamage(float damage)
-    {
-        PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
-    }
-
-    [PunRPC]
-    void RPC_TakeDamage(float damage)
-    {
-        if(!PV.IsMine)
-        return;
-
-       currentHealth -= damage;
-       inGameUiController.TakeDamage();
-       if(currentHealth <= 0)
-       {
-           Die();
-       }
-    }
-    void Die()
-    {
-        rewardPrefab = PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs",rewardPrefab.name),transform.position, Quaternion.identity);
-        rewardPrefab.GetComponent<RewardBehavior>().reward = score.currentScore;
-        MenuManager.Instance.OpenMenu("defeat"); 
-        isdead = true;
-        score.currentScore = 0;
-        Cursor.visible = (true);
-        Cursor.lockState = CursorLockMode.Confined;
-    }
     
     public void GetReward(int reward)
     {
         if(PV.IsMine)
         {
-            if(!isdead)
+            if(healthManager.isDead == false)
             {
                 Debug.Log(reward);
                 score.currentScore += reward;
-            }
-            
+            }            
+        }
+    }
+
+    void DeadCheck()
+    {
+        if(healthManager.isDead)
+        {
+           inGameUiController.ExitLevel();
         }
     }
 }
