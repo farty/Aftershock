@@ -57,7 +57,8 @@ public class PlayerController : MonoBehaviourPunCallbacks
         if(PV.IsMine)
         {
             EquipItem(0);
-            InGameUi = Instantiate(InGameUi, Vector3.zero, Quaternion.identity);            
+            InGameUi = Instantiate(InGameUi, Vector3.zero, Quaternion.identity);  
+            InGameUi.transform.parent = gameObject.transform;          
             inGameUiController = InGameUi.GetComponent<InGameUi>();
             inGameUiController.healthManager = GetComponent<HealthManager>();
             score = inGameUiController.GetComponentInChildren<ScoreCounter>();

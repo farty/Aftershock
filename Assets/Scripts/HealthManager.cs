@@ -5,7 +5,7 @@ using UnityEngine;
 using Photon.Realtime;
 using System.IO;
 
-public class HealthManager : MonoBehaviour
+public class HealthManager : MonoBehaviourPunCallbacks
 {
     
     public PhotonView PV;
@@ -20,17 +20,22 @@ public class HealthManager : MonoBehaviour
         playerController = GetComponent<PlayerController>();
         currentHealth = maxHealth;
     }
-
     public void TakeDamage(float damage)
     {
+        if(PV.IsMine) 
+        {
+            PV.RPC("RPC_TakeDamage", RpcTarget.All, damage);
+        }    
+    }
+    [PunRPC]
+    void RPC_TakeDamage(float damage)
+    {
         
-        if(!PV.IsMine)
-        return;
-
-       currentHealth -= damage;
-       if(currentHealth <= 0)
-       {
-           isDead = true;
-       }
+        currentHealth -= damage;
+        Debug.Log(damage);
+        if(currentHealth <= 0)
+        {
+            isDead = true;
+        }
     }
 }
