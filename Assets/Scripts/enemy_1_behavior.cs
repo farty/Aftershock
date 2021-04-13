@@ -117,6 +117,8 @@ public class enemy_1_behavior : MonoBehaviour
             {
                 if(targetPlayer != null)
                 {
+                    Debug.Log(targetPlayer.name);   
+                    Debug.Log(targetPlayer.GetComponent<HealthManager>().isDead);   
                     timeBetweenAttacks = 0;
                     if(targetPlayer.GetComponent<HealthManager>().isDead == false)
                     {

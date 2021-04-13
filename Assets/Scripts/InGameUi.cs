@@ -49,8 +49,7 @@ public class InGameUi : MonoBehaviour
     }
     public void ExitLevel()
     {
-        GameObject roomManager = GameObject.FindWithTag("room_manager");
-        Destroy(roomManager);
+        
         StartCoroutine(DisconnectAndLoad());
         Cursor.lockState = CursorLockMode.None;
         Cursor.visible = true;
@@ -63,6 +62,8 @@ public class InGameUi : MonoBehaviour
         
         yield return null;
         SceneManager.LoadScene(0); 
+        GameObject roomManager = GameObject.FindWithTag("room_manager");
+        Destroy(roomManager);
     }
     
     void DamageIndicator()

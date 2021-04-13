@@ -7,14 +7,22 @@ using System.IO;
 public class SingleShotgun : MonoBehaviourPunCallbacks
 {
     [SerializeField] 
-    GameObject itemGameObject;
-    [SerializeField] 
     GameObject bulletSpawnPoint;
     [SerializeField] 
     GameObject bullet;
     [SerializeField] 
     GameObject owner;
+    [SerializeField] 
+    float reloadTime;
+    float reloadCur;
+    [SerializeField]
+    int bulletsMax;
+    int bulletsCur;
+    [SerializeField]
+    float timeBetweenShots;
+    float curTimeBetweenShots;
 
+    bool isReloaded;
     void Update()
     {
         if(Input.GetMouseButtonDown(0))
@@ -26,6 +34,10 @@ public class SingleShotgun : MonoBehaviourPunCallbacks
     {
         if(owner.GetComponent<PlayerController>().PV.IsMine)
         {
+            if(isReloaded)
+            {
+
+            }
             PhotonNetwork.Instantiate(Path.Combine("PhotonPrefabs" , bullet.name), bulletSpawnPoint.transform.position, bulletSpawnPoint.transform.rotation);
         }                    
     } 

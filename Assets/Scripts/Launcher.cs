@@ -141,6 +141,7 @@ public class Launcher : MonoBehaviourPunCallbacks
     {
         PhotonNetwork.LoadLevel(1);
         MenuManager.Instance.OpenMenu("in game ui");
+        
     }
     
     public void QuitGame()
